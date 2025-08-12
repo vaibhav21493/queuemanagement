@@ -16,7 +16,7 @@ def set_background(local_file=None):
             f"""
             <style>
             .stApp {{
-                background-image: url("data:image/{mime};base64,{encoded}");
+                background-image: url('{https://github.com/vaibhav21493/queuemanagement/blob/main/quemain.png?raw=true}');
                 background-size: cover;
                 background-repeat: no-repeat;
                 background-attachment: fixed;
@@ -146,6 +146,7 @@ class LandingPage:
 # ✅ Optional direct execution
 if __name__ == "__main__":
     LandingPage().display()
+
 
 
 
