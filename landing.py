@@ -3,35 +3,48 @@ import base64
 import os
 
 
-def set_background(local_file=None):
-    if local_file:
-        if not os.path.exists(local_file):
-            st.error(f"Background image not found at {local_file}")
-            return
+def set_background(local_file=None, remote_url=None):
+    """
+    Set a background image from either a local file or an online URL.
+    - local_file: Path to local image file
+    - remote_url: Direct raw URL to the image (GitHub raw link, etc.)
+    """
+    if local_file and os.path.exists(local_file):
+        # Load local image as base64
         with open(local_file, "rb") as img_file:
             encoded = base64.b64encode(img_file.read()).decode()
         ext = local_file.split('.')[-1].lower()
         mime = "png" if ext == "png" else "jpeg"
-        st.markdown(
-            f"""
-            <style>
-            .stApp {{
-                background-image: url('{https://github.com/vaibhav21493/queuemanagement/blob/main/quemain.png?raw=true}');
-                background-size: cover;
-                background-repeat: no-repeat;
-                background-attachment: fixed;
-                background-position: center;
-            }}
-            </style>
-            """,
-            unsafe_allow_html=True,
-        )
+        background = f"data:image/{mime};base64,{encoded}"
+    elif remote_url:
+        # Use remote image link directly
+        background = remote_url
+    else:
+        st.error("No valid background image found.")
+        return
+
+    # Apply background with CSS
+    st.markdown(
+        f"""
+        <style>
+        .stApp {{
+            background-image: url('{background}');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
-# ✅ >> Convert LandingPage into a Class with a `display()` method
+# ✅ Landing Page Class
 class LandingPage:
     def display(self):
-        set_background(local_file=r"https://github.com/vaibhav21493/queuemanagement/blob/main/quemain.png?raw=true")
+        # For cloud deployment, use GitHub raw link
+        set_background(remote_url="https://raw.githubusercontent.com/vaibhav21493/queuemanagement/main/quemain.png")
 
         st.markdown("""
             <style>
@@ -105,9 +118,9 @@ class LandingPage:
         # Hospital Logos
         st.markdown("""
             <div class="logo-row">
-                <img src="https://cdn-icons-png.flaticon.com/512/2965/2965567.png" class="hospital-logo-img" alt="City Hospital Logo" title="City Hospital">
-                <img src="https://cdn-icons-png.flaticon.com/512/2965/2965568.png" class="hospital-logo-img" alt="Green Valley Clinic Logo" title="Green Valley Clinic">
-                <img src="https://cdn-icons-png.flaticon.com/512/2965/2965569.png" class="hospital-logo-img" alt="Sunrise Hospital Logo" title="Sunrise Hospital">
+                <img src="https://cdn-icons-png.flaticon.com/512/2965/2965567.png" class="hospital-logo-img">
+                <img src="https://cdn-icons-png.flaticon.com/512/2965/2965568.png" class="hospital-logo-img">
+                <img src="https://cdn-icons-png.flaticon.com/512/2965/2965569.png" class="hospital-logo-img">
             </div>
         """, unsafe_allow_html=True)
 
@@ -117,28 +130,28 @@ class LandingPage:
             st.markdown("""
                 <div class="info-card">
                     <h3>⏳ Live Queue Tracking</h3>
-                    <p>Monitor real-time patient flow and waiting times for every department, improving transparency and efficiency.</p>
+                    <p>Monitor real-time patient flow and waiting times for every department.</p>
                 </div>
             """, unsafe_allow_html=True)
         with col2:
             st.markdown("""
                 <div class="info-card">
                     <h3>📱 Online Appointment Booking</h3>
-                    <p>Patients can book, reschedule, or cancel appointments online, reducing overcrowding and saving time.</p>
+                    <p>Book, reschedule, or cancel appointments online, reducing overcrowding.</p>
                 </div>
             """, unsafe_allow_html=True)
         with col3:
             st.markdown("""
                 <div class="info-card">
                     <h3>📊 Analytics Dashboard</h3>
-                    <p>Gain insights into patient volumes, peak hours, and service bottlenecks to optimize hospital resources.</p>
+                    <p>Gain insights into patient volumes, peak hours, and bottlenecks.</p>
                 </div>
             """, unsafe_allow_html=True)
 
         # Start Button
         st.markdown("<div style='display:flex; justify-content:center;'>", unsafe_allow_html=True)
-        if st.button("Start 🚀", key="start_btn", help="Click to begin your journey"):
-            st.session_state.page = "auth"  # Go to login/register section
+        if st.button("Start 🚀", key="start_btn"):
+            st.session_state.page = "auth"
             st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
 
@@ -146,7 +159,3 @@ class LandingPage:
 # ✅ Optional direct execution
 if __name__ == "__main__":
     LandingPage().display()
-
-
-
-
