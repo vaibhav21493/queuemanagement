@@ -31,7 +31,7 @@ def set_background(local_file=None):
 # ✅ >> Convert LandingPage into a Class with a `display()` method
 class LandingPage:
     def display(self):
-        set_background(local_file=r""D:\internwork\quemain.png"")
+        set_background(local_file=r"D:\internwork\quemain.png")
 
         st.markdown("""
             <style>
@@ -146,4 +146,5 @@ class LandingPage:
 # ✅ Optional direct execution
 if __name__ == "__main__":
     LandingPage().display()
+
 
