@@ -8,7 +8,6 @@ from login_page import LoginPage
 from register_page import RegistrationPage
 from db_manager import DBManager
 from landing import LandingPage
-import os
 
 
 class MainApplication:
@@ -30,39 +29,35 @@ class MainApplication:
 
     def set_background(self):
         """
-        Try to set background from local file; if not found, use GitHub raw URL.
+        Always use remote GitHub image for Streamlit Cloud compatibility.
         """
-        local_path = os.path.join("static", "images", "maingue4.png")
-
-        # ✅ If file exists locally, load it
-        if os.path.exists(local_path):
-            self.user_manager.set_background(local_file=local_path)
-        else:
-            # ✅ Fallback: use remote image from GitHub
-            github_url = (
-                "https://raw.githubusercontent.com/"
-                "vaibhav21493/queuemanagement/main/static/images/maingue4.png"
-            )
+        github_url = (
+            "https://raw.githubusercontent.com/vaibhav21493/"
+            "queuemanagement/main/static/images/maingue4.png"
+        )
+        try:
             self.user_manager.set_background(remote_url=github_url)
+        except Exception as e:
+            st.error(f"Failed to set background: {e}")
 
     def run(self):
-        # ✅ Set background first
+        # ✅ Set background globally
         self.set_background()
 
-        # 🔹 Initialize session state variables (only if not already set)
+        # 🔹 Initialize session state variables
         st.session_state.setdefault("page", "landing")
         st.session_state.setdefault("logged_in", False)
         st.session_state.setdefault("current_user", "")
 
-        # 🔹 Before Login
+        # 🔹 Before Login (User not logged in)
         if not st.session_state.logged_in:
 
-            # Landing Page
+            # 1️⃣ Landing Page
             if st.session_state.page == "landing":
                 self.landing.display()
-                return
+                return  # Stop here
 
-            # Login / Register
+            # 2️⃣ Auth options
             if st.session_state.page == "auth":
                 page_choice = st.sidebar.radio("Choose Action", ["Login", "Register"])
                 if page_choice == "Login":
@@ -71,7 +66,7 @@ class MainApplication:
                     self.register_page.display()
                 return
 
-        # 🔹 Logged in view
+        # ✅ Logged in view
         if st.session_state.logged_in:
             st.sidebar.markdown(f"**Welcome, `{st.session_state.current_user}`! 🎉**")
             st.sidebar.markdown("---")
@@ -95,11 +90,10 @@ class MainApplication:
             if st.sidebar.button("🚪 Logout"):
                 self.logout()
 
-        # Apply sidebar styles
+        # 🔹 Optional styling
         self.apply_sidebar_style()
 
     def apply_sidebar_style(self):
-        """Custom styling for sidebar."""
         st.markdown("""
             <style>
             [data-testid="stSidebar"] {
@@ -114,7 +108,7 @@ class MainApplication:
         """, unsafe_allow_html=True)
 
     def logout(self):
-        """Clear user session data and return to landing."""
+        """Clear user session data."""
         keys_to_clear = [
             "logged_in", "current_user", "page",
             "selected_hospital", "selected_department", "selected_doctor",
@@ -122,5 +116,4 @@ class MainApplication:
         ]
         for key in keys_to_clear:
             st.session_state.pop(key, None)
-        st.session_state.page = "landing"
         st.rerun()
