@@ -1,5 +1,6 @@
 import streamlit as st
-import os
+import requests
+import base64
 from user_management import UserManager
 from patient_health_data import PatientHealthDataPage
 from appointment_booking import AppointmentBookingPage
@@ -30,21 +31,31 @@ class MainApplication:
 
     def set_background(self):
         """
-        Try to use local image if it exists, otherwise load from GitHub raw link.
+        Always use GitHub raw image for Streamlit Cloud compatibility.
         """
-        local_path = os.path.join("static", "images", "maingue4.png")
-        github_url = (
-            "https://raw.githubusercontent.com/vaibhav21493/"
-            "queuemanagement/main/static/images/maingue4.png"
-        )
-
+        github_url = "https://github.com/vaibhav21493/queuemanagement/blob/main/quemain.png?raw=true"
         try:
-            if os.path.exists(local_path):
-                self.user_manager.set_background(local_file=local_path)
+            response = requests.get(github_url)
+            if response.status_code == 200:
+                encoded_img = base64.b64encode(response.content).decode()
+                st.markdown(
+                    f"""
+                    <style>
+                    .stApp {{
+                        background-image: url("data:image/png;base64,{encoded_img}");
+                        background-size: cover;
+                        background-repeat: no-repeat;
+                        background-attachment: fixed;
+                        background-position: center;
+                    }}
+                    </style>
+                    """,
+                    unsafe_allow_html=True
+                )
             else:
-                self.user_manager.set_background(remote_url=github_url)
+                st.error(f"Failed to load background image. HTTP {response.status_code}")
         except Exception as e:
-            st.error(f"Failed to set background: {e}")
+            st.error(f"Error loading background: {e}")
 
     def run(self):
         # ✅ Set background globally
