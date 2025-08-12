@@ -8,6 +8,7 @@ from login_page import LoginPage
 from register_page import RegistrationPage
 from db_manager import DBManager
 from landing import LandingPage
+import os
 
 
 class MainApplication:
@@ -27,30 +28,35 @@ class MainApplication:
         self.patient_health_data_page = PatientHealthDataPage()
         self.medical_services_page = MedicalServicesPage()
 
-    def set_background(self, local_file=None):
-        try:
-            self.user_manager.set_background(local_file)
-        except Exception:
-            pass
+    def set_background(self):
+        """
+        Try to set background from local file; if not found, use GitHub raw URL.
+        """
+        local_path = os.path.join("static", "images", "maingue4.png")
+        if os.path.exists(local_path):
+            self.user_manager.set_background(local_file=local_path)
+        else:
+            github_url = "https://raw.githubusercontent.com/vaibhav21493/queuemanagement/main/static/images/maingue4.png"
+            self.user_manager.set_background(remote_url=github_url)
 
     def run(self):
-        # Optionally set background globally
-        self.set_background(local_file=r"C:\Users\VAIBHAV\Desktop\queueM\static\images\maingue4.png")
+        # Set background globally
+        self.set_background()
 
-        # 🔹 Initialize session state variables
+        # Initialize session state variables
         st.session_state.setdefault("page", "landing")
         st.session_state.setdefault("logged_in", False)
         st.session_state.setdefault("current_user", "")
 
-        # 🔹 Before Login (User not logged in)
+        # Before Login
         if not st.session_state.logged_in:
 
-            # 1️⃣ Landing Page
+            # Landing Page
             if st.session_state.page == "landing":
                 self.landing.display()
-                return  # Prevent further code below from executing
+                return
 
-            # 2️⃣ After clicking Start 🚀 — show LOGIN or REGISTER option
+            # Login / Register Page
             if st.session_state.page == "auth":
                 page_choice = st.sidebar.radio("Choose Action", ["Login", "Register"])
                 if page_choice == "Login":
@@ -59,7 +65,7 @@ class MainApplication:
                     self.register_page.display()
                 return
 
-        # ✅ Logged in view
+        # Logged in view
         if st.session_state.logged_in:
             st.sidebar.markdown(f"**Welcome, `{st.session_state.current_user}`! 🎉**")
             st.sidebar.markdown("---")
@@ -83,7 +89,7 @@ class MainApplication:
             if st.sidebar.button("🚪 Logout"):
                 self.logout()
 
-        # 🔹 Optional styling
+        # Optional styling
         self.apply_sidebar_style()
 
     def apply_sidebar_style(self):
